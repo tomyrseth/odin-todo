@@ -12,13 +12,39 @@ function clearContentDiv() { contentDiv.replaceChildren(''); }
 function buildProjectsPage(){ //Display all projects and + button
   clearContentDiv();
 
-  //Project Buttons
+  //Containers
+  const outerContainer = document.createElement('div');
+  outerContainer.id = 'outerContainer';
+  const upperContainer = document.createElement('div');
+  upperContainer.id = 'upperContainer';
+  const lowerContainer = document.createElement('div');
+  lowerContainer.id = 'lowerContainer';
+  outerContainer.appendChild(upperContainer);
+  outerContainer.appendChild(lowerContainer);
+  contentDiv.appendChild(outerContainer);
+
+  //Projects container with buttons
   projectList.forEach(project => {
-    const btn = document.createElement('button');
-    btn.dataset.index = projectList.indexOf(project); // give project buttons index data
-    btn.id = 'projectBtn'
-    btn.innerText = project.name;
-    contentDiv.appendChild(btn);
+
+    const projectDiv = document.createElement('div');
+    projectDiv.id = 'projectDiv';
+    lowerContainer.appendChild(projectDiv);
+
+    const projectName = document.createElement('h2');
+    projectDiv.appendChild(projectName);
+    projectName.innerText = project.name;
+    
+    const openButton = document.createElement('button');
+    openButton.dataset.projectid = project.id; // give project buttons index data
+    openButton.id = 'projectOpenBtn'
+    openButton.innerText = 'Open';
+    projectDiv.appendChild(openButton);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.dataset.projectid = project.id;
+    deleteButton.id = 'projectDeleteBtn'
+    deleteButton.innerText = 'Delete';
+    projectDiv.appendChild(deleteButton);
   });
 
   // Project dialog && form
@@ -26,27 +52,38 @@ function buildProjectsPage(){ //Display all projects and + button
   projectDia.id = 'projectDia';
   const projectForm = buildProjectForm();
   projectForm.id = 'projectForm';
+  contentDiv.appendChild(projectDia);
+  projectDia.appendChild(projectForm);
+
 
   //+ Button for projects
   const newProjBtn = document.createElement('button');
   newProjBtn.id = 'newProjectBtn';
-  newProjBtn.innerText = '+';
+  newProjBtn.innerText = '+ Add Project';
+  newProjBtn.className = 'plusBtn'
+  upperContainer.appendChild(newProjBtn);
 
-  contentDiv.appendChild(newProjBtn);
-  contentDiv.appendChild(projectDia);
-  contentDiv.appendChild(projectForm);
-
-  contentDiv.appendChild(projectDia);
-  projectDia.appendChild(projectForm);
 }
 
 function buildAllTodosInProject(proj) { //Builds all todos in a project
 
+  //Containers
+  const outerContainer = document.createElement('div');
+  outerContainer.id = 'outerContainer';
+  const upperContainer = document.createElement('div');
+  upperContainer.id = 'upperContainer';
+  const lowerContainer = document.createElement('div');
+  lowerContainer.id = 'lowerContainer';
+  outerContainer.appendChild(upperContainer);
+  outerContainer.appendChild(lowerContainer);
+  contentDiv.appendChild(outerContainer);
+
   //Back button
   const backBtn = document.createElement('button');
   backBtn.innerText = '<-';
-  backBtn.id = 'backButton';
-  contentDiv.appendChild(backBtn);
+  backBtn.id = 'backToProjectsButton';
+  backBtn.className = 'backButton'
+  upperContainer.appendChild(backBtn);
 
   //Todo buttons
   const todoList = proj.getTodoList();
@@ -56,7 +93,7 @@ function buildAllTodosInProject(proj) { //Builds all todos in a project
     btn.dataset.todoid = todo.id; // give todo buttons id data
     btn.id = 'todoBtn';
     btn.innerText = todo.title;
-    contentDiv.appendChild(btn);
+    lowerContainer.appendChild(btn);
   });
 
   // Todo dialog && form
@@ -65,15 +102,15 @@ function buildAllTodosInProject(proj) { //Builds all todos in a project
   const todoForm = buildTodoForm();
   todoForm.id = 'todoForm';
   todoForm.dataset.projectid = proj.id;
+  contentDiv.appendChild(todoDia);
+  todoDia.appendChild(todoForm);
 
   //+ Todo button
   const newTodoBtn = document.createElement('button');
   newTodoBtn.id = 'newTodoBtn';
-  newTodoBtn.innerText = '+';
-  contentDiv.appendChild(newTodoBtn)
-
-  contentDiv.appendChild(todoDia);
-  todoDia.appendChild(todoForm);
+  newTodoBtn.className = 'plusBtn'
+  newTodoBtn.innerText = '+ Add Todo';
+  upperContainer.appendChild(newTodoBtn)
 }
 
 function buildSingleTodo(todo) { 
@@ -82,13 +119,19 @@ function buildSingleTodo(todo) {
   const todoProperties = [todo.title, todo.description, todo.dueDate, todo.priority, todo.completed];
   const todoPropNames = ['Title: ', 'Description: ', 'Due Date: ', 'Priority: ', 'Completed: '];
 
+  const backBtn2 = document.createElement('button');
+  backBtn2.id = 'backToTodosButton';
+  backBtn2.dataset.todoid = todo.id;
+  backBtn2.innerText = '<-';
+  backBtn2.className = 'backButton'
+  contentDiv.appendChild(backBtn2);
+
   //Todo Inner div
   const todoPropLength = todoProperties.length;
   const innerDiv = document.createElement('div');
   contentDiv.appendChild(innerDiv);
   innerDiv.id = 'innerDiv';
   
-  //Todo Top title
   const mainTitle = document.createElement('h2');
   mainTitle.innerText = 'Todo:';
   innerDiv.appendChild(mainTitle);
@@ -100,12 +143,17 @@ function buildSingleTodo(todo) {
     innerDiv.appendChild(p1);
   }
 
-  //Todo Back button
-  const backBtn = document.createElement('button');
-  backBtn.innerText = '<-';
-  backBtn.className = 'backButton';
-  //backBtn.addEventListener('click', () => displayTodos(lastClickedProject));
-  innerDiv.appendChild(backBtn);
+  const completeButton = document.createElement('button');
+  completeButton.dataset.todoid = todo.id;
+  completeButton.id = 'todoToggleButton';
+  completeButton.innerText = 'Toggle Complete';
+  innerDiv.appendChild(completeButton);
+
+  const deleteButton = document.createElement('button');
+  deleteButton.dataset.todoid = todo.id;
+  deleteButton.id = 'todoDeleteButton';
+  deleteButton.innerText = 'Delete';
+  innerDiv.appendChild(deleteButton);
 }
 
 function buildProjectForm() {

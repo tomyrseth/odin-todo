@@ -7,7 +7,7 @@ export class Todo {
     this.priority = priority;
     this.completed = false;
   }
-  setComplete() {
+  toggleComplete() {
     this.completed = !this.completed;
     return 1;
   }

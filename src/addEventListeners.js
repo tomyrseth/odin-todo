@@ -1,14 +1,26 @@
-export { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener }
+export { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener, addSingleTodoEventListeners }
 
 function addProjectEventListeners() {
 
-    const projectButtons = document.querySelectorAll("#projectBtn");
-    projectButtons.forEach(btn => {
+    const projectOpenButtons = document.querySelectorAll("#projectOpenBtn");
+    projectOpenButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
   
-        const projectIndex = e.target.dataset.index;
+        const projectid = e.target.dataset.projectid;
         const event = new CustomEvent('project:click', { 
-          detail: { projectIndex, button: e.target } 
+          detail: { projectid, button: e.target } 
+        });
+        document.dispatchEvent(event);
+      });
+    });
+
+    const projectDeleteButtons = document.querySelectorAll("#projectDeleteBtn");
+    projectDeleteButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+  
+        const projectid = e.target.dataset.projectid;
+        const event = new CustomEvent('project:delete', { 
+          detail: { projectid, button: e.target } 
         });
         document.dispatchEvent(event);
       });
@@ -44,6 +56,16 @@ function addTodoEventListeners() {
     });
     document.dispatchEvent(event);
   })
+
+  const backToProjectsButton = document.getElementById('backToProjectsButton');
+  backToProjectsButton.addEventListener('click', (e) => {
+    const event = new CustomEvent('backToProjects:click', { 
+      detail: {  } 
+    });
+    document.dispatchEvent(event);
+  })
+
+
 }
 
 function addProjectFormEventListener() {
@@ -67,4 +89,35 @@ function addTodoFormEventListener() {
     });
     document.dispatchEvent(event);
   })
+}
+
+function addSingleTodoEventListeners() {
+  const backToTodosButton = document.getElementById('backToTodosButton');
+  backToTodosButton.addEventListener('click', (e) => {
+    const todoid = e.target.dataset.todoid;
+    const event = new CustomEvent('backToTodos:click', { 
+      detail: { todoid } 
+    });
+    document.dispatchEvent(event);
+  })
+
+  const todoDeleteButton = document.getElementById('todoDeleteButton');
+  todoDeleteButton.addEventListener('click', (e) => {
+    const todoid = e.target.dataset.todoid;
+    const event = new CustomEvent('todo:delete', { 
+      detail: { todoid } 
+    });
+    document.dispatchEvent(event);
+  })
+
+  
+  const todoToggleButton = document.getElementById('todoToggleButton');
+  todoToggleButton.addEventListener('click', (e) => {
+    const todoid = e.target.dataset.todoid;
+    const event = new CustomEvent('todo:toggle', { 
+      detail: { todoid } 
+    });
+    document.dispatchEvent(event);
+  })
+
 }
