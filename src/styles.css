@@ -1,55 +1,109 @@
 /* styles.css */
 body {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(63, 90, 137);
   margin: 0;
 }
 
 nav {
   display: flex;
   justify-content: space-around;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(106, 148, 223);
+  color: rgb(244, 244, 244);
+  font-weight: 800;
   border: none;
   box-shadow: 2px 5px 25px -3px rgba(0,0,0,0.75);
 }
 
+nav h1 {
+  margin: 20px;
+  font-size: 50px;
+  font-weight: 800;
+}
+
 button {
   font-weight: 800;
-  height: 4em;
-  width: 8em;
-  margin: 20px;
-  border-radius: 50px;
+  margin: 4px;
+  border-radius: 10px;
   border: 3px solid rgb(36, 36, 36);
   background-color: rgb(255, 255, 255);
   cursor: pointer;
   transition: 0.3s;
-  
+  padding: 20px;
+  transition: 0.2s;
 }
 
 button:hover {
-  color: white;
-  background-color: black;
   box-shadow: 2px 8px 12px -3px rgba(0,0,0,0.75);
-  scale: 1.1;
+  scale: 1.05;
 }
 
 button:active {
   scale: 1;
-  transition: 0.1s;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
+.backButton {
+  font-weight: 800;
+  margin: 0px 5px 5px 5px;
+  border-radius: 50px;
+  border: 3px solid rgb(36, 36, 36);
+  background-color: rgb(0, 0, 0);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#projectDiv {
+  display: flex;
+  border: solid 2px red;
+}
+
+#innerDiv {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(9, 9, 9);
+  padding: 50px;
+  border-radius: 20px;
+  border: none;
+}
+
+#innerDiv p{
+  color: white;
+  font-weight: 600;
+}
+
+#innerDiv h2 {
+  color: white;
+  font-size: 40px;
+  margin: 0;
 }
 
 #content {
+  margin-top: 50px;
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+/*
+dialog {
+  font-size: 30px;
+  font-weight: 400;
   flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  border-radius: 10px;
+}
+*/
+:modal {
+  padding: 20px;
+  border-radius: 20px;
 }
 
-.inner {
+form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 10px;
+}
+
+
+input {
+  font-size: 20px;
 }
