@@ -1,7 +1,3 @@
-//
-// Builds Project and Todo objects from localstorage data
-//
-
 export class Builder {
   constructor(Project, Todo, projList) {
     this.projectClass = Project;

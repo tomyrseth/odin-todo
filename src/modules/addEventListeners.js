@@ -1,3 +1,7 @@
+//
+// Selects DOM elements and attaches custom events, AppHandler instance listens for these events and applies logic.
+//
+
 export { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener, addSingleTodoEventListeners }
 
 function addProjectEventListeners() {

@@ -15,6 +15,7 @@ class AppHandler {
     this.TodoClass = Todo;
     this.BuilderClass = Builder;
 
+    //Listen for custom events, do logic
     document.addEventListener('project:click', (event) => this.projectClick(this.getProjectFromEvent(event)));
     document.addEventListener('todo:click', (event) => this.todoClick(this.getProjectFromEvent(event), event));
 
@@ -31,6 +32,7 @@ class AppHandler {
     document.addEventListener('backToTodos:click', (event) => this.backToTodos(this.getProjectFromEvent(event)));
 
     document.addEventListener('todo:toggle', (event) => this.todoToggle(this.getProjectFromEvent(event), event));
+
   }
   getProjectFromEvent(event) {
     const project = projectList[projectList.findIndex((element) => element.id === event.detail.projectid)];
@@ -140,7 +142,6 @@ class AppHandler {
     else if (projectList.length > 0) {
       localStorage.setItem('projectList', JSON.stringify(projectList));
     }
-
   }
 
   getFromLocalStorage() {
