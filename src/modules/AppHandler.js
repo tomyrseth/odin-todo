@@ -2,7 +2,7 @@
 // Some sort of state / event-logic handler
 //
 
-import "./styles.css";
+import "../styles.css";
 import { buildProjectsPage, buildAllTodosInProject, buildSingleTodo, clearContentDiv } from "./DOMBuilder.js";
 import { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener, addSingleTodoEventListeners } from "./addEventListeners.js";
 export { AppHandler }
