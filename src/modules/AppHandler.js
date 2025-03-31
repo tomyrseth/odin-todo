@@ -39,7 +39,7 @@ export class AppHandler {
 
   }
   getProjectFromEvent(event) {
-    const project = this.projectList[this.projectList.findIndex((element) => element.id === event.detail.projectid)];
+    const project = this.projectList.find((element) => element.id === event.detail.projectid);
     if (project) return project;
     throw Error('Could not find project from event!');
   }
