@@ -95,8 +95,9 @@ function addSingleTodoEventListeners() {
   const backToTodosButton = document.getElementById('backToTodosButton');
   backToTodosButton.addEventListener('click', (e) => {
     const todoid = e.target.dataset.todoid;
+    const projectid = e.target.dataset.projectid;
     const event = new CustomEvent('backToTodos:click', { 
-      detail: { todoid } 
+      detail: { todoid, projectid } 
     });
     document.dispatchEvent(event);
   })
@@ -104,8 +105,9 @@ function addSingleTodoEventListeners() {
   const todoDeleteButton = document.getElementById('todoDeleteButton');
   todoDeleteButton.addEventListener('click', (e) => {
     const todoid = e.target.dataset.todoid;
+    const projectid = e.target.dataset.projectid;
     const event = new CustomEvent('todo:delete', { 
-      detail: { todoid } 
+      detail: { todoid, projectid } 
     });
     document.dispatchEvent(event);
   })
@@ -114,8 +116,9 @@ function addSingleTodoEventListeners() {
   const todoToggleButton = document.getElementById('todoToggleButton');
   todoToggleButton.addEventListener('click', (e) => {
     const todoid = e.target.dataset.todoid;
+    const projectid = e.target.dataset.projectid;
     const event = new CustomEvent('todo:toggle', { 
-      detail: { todoid } 
+      detail: { todoid, projectid } 
     });
     document.dispatchEvent(event);
   })

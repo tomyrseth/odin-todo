@@ -1,8 +1,8 @@
 //
-// Builds DOM elements
+// Builds DOM elements, attaches attributes
 //
 
-import { projectList } from "./AppHandler.js";
+import { projectList } from "./AppHandler";
 export { buildProjectsPage, buildAllTodosInProject, buildSingleTodo, clearContentDiv }
 
 const contentDiv = document.getElementById('content');
@@ -122,6 +122,7 @@ function buildSingleTodo(todo) {
   const backBtn2 = document.createElement('button');
   backBtn2.id = 'backToTodosButton';
   backBtn2.dataset.todoid = todo.id;
+  backBtn2.dataset.projectid = todo.parentProjectid;
   backBtn2.innerText = '<-';
   backBtn2.className = 'backButton'
   contentDiv.appendChild(backBtn2);
@@ -144,6 +145,7 @@ function buildSingleTodo(todo) {
   }
 
   const completeButton = document.createElement('button');
+  completeButton.dataset.projectid = todo.parentProjectid;
   completeButton.dataset.todoid = todo.id;
   completeButton.id = 'todoToggleButton';
   completeButton.innerText = 'Toggle Complete';
@@ -151,6 +153,7 @@ function buildSingleTodo(todo) {
 
   const deleteButton = document.createElement('button');
   deleteButton.dataset.todoid = todo.id;
+  deleteButton.dataset.projectid = todo.parentProjectid;
   deleteButton.id = 'todoDeleteButton';
   deleteButton.innerText = 'Delete';
   innerDiv.appendChild(deleteButton);

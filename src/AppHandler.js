@@ -6,12 +6,14 @@ import "./styles.css";
 import { buildProjectsPage, buildAllTodosInProject, buildSingleTodo, clearContentDiv } from "./DOMBuilder.js";
 import { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener, addSingleTodoEventListeners } from "./addEventListeners.js";
 export { AppHandler }
+
 export const projectList = [];
 
 class AppHandler {
-  constructor(Project, Todo) {
+  constructor(Project, Todo, Builder) {
     this.ProjectClass = Project; //Dependency Injections
     this.TodoClass = Todo;
+    this.BuilderClass = Builder;
 
     document.addEventListener('project:click', (event) => this.projectClick(this.getProjectFromEvent(event)));
     document.addEventListener('todo:click', (event) => this.todoClick(this.getProjectFromEvent(event), event));
@@ -23,12 +25,12 @@ class AppHandler {
     document.addEventListener('todoForm:submit', (event) => this.submitNewTodo(this.getProjectFromEvent(event), event));
 
     document.addEventListener('project:delete', (event) => this.projectDelete(this.getProjectFromEvent(event)));
-    document.addEventListener('todo:delete', (event) => this.todoDelete(event));
+    document.addEventListener('todo:delete', (event) => this.todoDelete(this.getProjectFromEvent(event) ,event));
 
-    document.addEventListener('backToProjects:click', (event) => this.backToProjects());
-    document.addEventListener('backToTodos:click', (event) => this.backToTodos(event));
+    document.addEventListener('backToProjects:click', () => this.backToProjects());
+    document.addEventListener('backToTodos:click', (event) => this.backToTodos(this.getProjectFromEvent(event)));
 
-    document.addEventListener('todo:toggle', (event) => this.toggleTodo(event));
+    document.addEventListener('todo:toggle', (event) => this.todoToggle(this.getProjectFromEvent(event), event));
   }
   getProjectFromEvent(event) {
     const project = projectList[projectList.findIndex((element) => element.id === event.detail.projectid)];
@@ -36,13 +38,14 @@ class AppHandler {
     throw Error('Could not find project from event!');
   }
 
-  toggleTodo(event) {
-    const project = this.getProjectTodoBelongsTo(event);
+  todoToggle(project, event) {
     const todoid = event.detail.todoid;
     const todo = project.todoList.find((element) => element.id === todoid);
+    
     todo.toggleComplete();
     clearContentDiv()
     this.buildSingleTodo(project, event);
+    this.setLocalStorage();
   }
 
   projectClick(project) {
@@ -61,8 +64,9 @@ class AppHandler {
     const form = event.detail.form;
     const formData = new FormData(form);
     const name = formData.get('name');
-    const newProject = new this.ProjectClass(name, this.TodoClass);
+    const newProject = new this.ProjectClass( { name:name, todo:this.TodoClass } );
     projectList.push(newProject);
+    this.setLocalStorage();
     this.refreshProjectPage();
   }
   todoPlusButtonClick(event) { //init form
@@ -82,6 +86,7 @@ class AppHandler {
     const priority = formData.get('priority');
     const newTodo = project.createTodo(title, description, dueDate, priority);
 
+    this.setLocalStorage();
     this.refreshTodoPage(project);
   }
   projectDelete(project) {
@@ -89,30 +94,22 @@ class AppHandler {
     if (index > -1) { // only splice array when item is found
       projectList.splice(index, 1);
     }
+    this.setLocalStorage();
     this.refreshProjectPage();
   }
-  todoDelete(event) {
-    const project = this.getProjectTodoBelongsTo(event);
+  todoDelete(project, event) {
     const todoid = event.detail.todoid;
     const todo = project.todoList.find((element) => element.id === todoid);
     project.removeTodo(todo);
+    this.setLocalStorage();
     this.refreshTodoPage(project);
   }
 
   backToProjects() {
     this.refreshProjectPage();
   }
-  backToTodos(event) {
-    const project = this.getProjectTodoBelongsTo(event);
+  backToTodos(project) {
     this.refreshTodoPage(project);
-  }
-
-  getProjectTodoBelongsTo(event){
-    for (const project of projectList) {
-      const todo = project.todoList.find((todo) => todo.id === event.detail.todoid);
-      if (todo) return project;
-    }
-    throw Error('Could not find project todo belongs to!');
   }
 
   buildAllTodosInProject(event) {
@@ -136,40 +133,35 @@ class AppHandler {
     addTodoEventListeners();
   }
 
+  setLocalStorage() {
+    if (projectList.length === 0){
+      localStorage.clear;
+    }
+    else if (projectList.length > 0) {
+      localStorage.setItem('projectList', JSON.stringify(projectList));
+    }
+
+  }
+
+  getFromLocalStorage() {
+    if (localStorage.length != 0) {
+      const projectListInStorage = JSON.parse(localStorage.getItem('projectList'));
+      
+      const objBuilder = new this.BuilderClass(this.ProjectClass, this.TodoClass, projectListInStorage);
+      const updatedProjectList = objBuilder.build();
+      updatedProjectList.forEach(project => {
+        projectList.push(project);
+      });
+    }
+    else if (localStorage.length === 0) {
+      //Make default project
+      const defaultProject = new this.ProjectClass({name: 'Default Project', todo: this.TodoClass});
+      projectList.push(defaultProject);
+    }
+  }
+
   initialize() {
-    //const defaultProject = new Project('Default Project', Todo);
-    const defaultProject = new this.ProjectClass('Default Project', this.TodoClass);
-    const defaultProject2 = new this.ProjectClass('Other', this.TodoClass);
-    projectList.push(defaultProject);
-    projectList.push(defaultProject2);
-  
-    const defaultProjectTodos = [
-      defaultProject.createTodo('Shopping', 'Buy weekly groceries', 'Thursday', 6),
-      defaultProject.createTodo('Laundry', 'Wash and fold clothes', 'Friday', 4),
-      defaultProject.createTodo('Home Maintenance', 'Fix kitchen sink leak', 'Saturday', 7),
-      defaultProject.createTodo('Fitness', 'Gym workout session', 'Monday', 5),
-      defaultProject.createTodo('Work Prep', 'Prepare presentation slides', 'Tuesday', 8),
-      defaultProject.createTodo('Car Service', 'Schedule annual maintenance', 'Wednesday', 3),
-      defaultProject.createTodo('Garden', 'Prune roses and water plants', 'Thursday', 2),
-      defaultProject.createTodo('Meal Prep', 'Cook meals for the week', 'Friday', 6),
-      defaultProject.createTodo('Bills', 'Pay monthly utilities', 'Saturday', 7),
-      defaultProject.createTodo('Learning', 'Complete online coding course module', 'Sunday', 5)
-    ];
-    const defaultProject2Todos = [
-      defaultProject2.createTodo('Clean Apartment', 'Vacuum and mop floors', 'Friday', 8),
-      defaultProject2.createTodo('Organize Closet', 'Sort and donate old clothes', 'Saturday', 6),
-      defaultProject2.createTodo('Car Wash', 'Clean interior and exterior', 'Sunday', 4),
-      defaultProject2.createTodo('Dentist Appointment', 'Annual check-up', 'Monday', 7),
-      defaultProject2.createTodo('Book Club', 'Finish monthly reading', 'Tuesday', 3),
-      defaultProject2.createTodo('Electronics Repair', 'Fix laptop screen', 'Wednesday', 5),
-      defaultProject2.createTodo('Financial Planning', 'Review monthly budget', 'Thursday', 6),
-      defaultProject2.createTodo('Plant Care', 'Repot indoor plants', 'Friday', 2),
-      defaultProject2.createTodo('Online Course', 'Complete photography module', 'Saturday', 7),
-      defaultProject2.createTodo('Bike Maintenance', 'Service and clean bicycle', 'Sunday', 4)
-    ];
-
-
-    //projectList.push(defaultProject);
+    this.getFromLocalStorage();
     buildProjectsPage();
     addProjectEventListeners();
   }
