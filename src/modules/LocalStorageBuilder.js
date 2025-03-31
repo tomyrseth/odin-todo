@@ -1,4 +1,4 @@
-export class Builder {
+export class LSBuilder {
   constructor(Project, Todo, projList) {
     this.projectClass = Project;
     this.todoClass = Todo;

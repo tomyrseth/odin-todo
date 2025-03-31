@@ -1,19 +1,23 @@
 //
 // Some sort of state / event-logic handler
 //
-
 import "../styles.css";
-import { buildProjectsPage, buildAllTodosInProject, buildSingleTodo, clearContentDiv } from "./DOMBuilder.js";
-import { addProjectEventListeners, addTodoEventListeners, addProjectFormEventListener, addTodoFormEventListener, addSingleTodoEventListeners } from "./addEventListeners.js";
-export { AppHandler }
 
-export const projectList = [];
-
-class AppHandler {
-  constructor(Project, Todo, Builder) {
+export class AppHandler {
+  constructor(Project, Todo, EventAttacher, DOMBuilder, LSBuilder) {
     this.ProjectClass = Project; //Dependency Injections
     this.TodoClass = Todo;
-    this.BuilderClass = Builder;
+    this.LocalStorageBuilder = LSBuilder;
+
+    this.projectList = [];
+    this.getFromLocalStorage();
+
+    this.EventAttacher = new EventAttacher();
+    this.DOMBuilder = new DOMBuilder(this.projectList);
+
+    //Init app
+    this.DOMBuilder.buildProjectsPage();
+    this.EventAttacher.addProjectEventListeners();
 
     //Listen for custom events, do logic
     document.addEventListener('project:click', (event) => this.projectClick(this.getProjectFromEvent(event)));
@@ -35,7 +39,7 @@ class AppHandler {
 
   }
   getProjectFromEvent(event) {
-    const project = projectList[projectList.findIndex((element) => element.id === event.detail.projectid)];
+    const project = this.projectList[this.projectList.findIndex((element) => element.id === event.detail.projectid)];
     if (project) return project;
     throw Error('Could not find project from event!');
   }
@@ -45,7 +49,7 @@ class AppHandler {
     const todo = project.todoList.find((element) => element.id === todoid);
     
     todo.toggleComplete();
-    clearContentDiv()
+    this.DOMBuilder.clearContentDiv()
     this.buildSingleTodo(project, event);
     this.setLocalStorage();
   }
@@ -54,27 +58,27 @@ class AppHandler {
     this.refreshTodoPage(project);
   }
   todoClick(project, event) {
-    clearContentDiv();
+    this.DOMBuilder.clearContentDiv();
     this.buildSingleTodo(project, event);
   }
   projectAddButtonClick(event) { //init form
     const modal = document.getElementById('projectDia');
     modal.showModal();
-    addProjectFormEventListener();
+    this.EventAttacher.addProjectFormEventListeners();
   }
   submitNewProject(event){
     const form = event.detail.form;
     const formData = new FormData(form);
     const name = formData.get('name');
     const newProject = new this.ProjectClass( { name:name, todo:this.TodoClass } );
-    projectList.push(newProject);
+    this.projectList.push(newProject);
     this.setLocalStorage();
     this.refreshProjectPage();
   }
   todoPlusButtonClick(event) { //init form
     const modal = document.getElementById('todoDia');
     modal.showModal();
-    addTodoFormEventListener();
+    this.EventAttacher.addTodoFormEventListeners();
   }
   submitNewTodo(project, event) {
     const todoList = project.getTodoList();
@@ -92,9 +96,9 @@ class AppHandler {
     this.refreshTodoPage(project);
   }
   projectDelete(project) {
-    const index = projectList.findIndex((element) => element.id === project.id);
+    const index = this.projectList.findIndex((element) => element.id === project.id);
     if (index > -1) { // only splice array when item is found
-      projectList.splice(index, 1);
+      this.projectList.splice(index, 1);
     }
     this.setLocalStorage();
     this.refreshProjectPage();
@@ -115,32 +119,32 @@ class AppHandler {
   }
 
   buildAllTodosInProject(event) {
-    const project = projectList[event.detail.projectIndex];
-    buildAllTodosInProject(project);
+    const project = this.projectList[event.detail.projectIndex];
+    this.DOMBuilder.buildAllTodosInProject(project);
   }
   buildSingleTodo(project, event) {
     const todoList = project.getTodoList();
     const todo = todoList[todoList.findIndex((element) => element.id === event.detail.todoid)];
-    buildSingleTodo(todo);
-    addSingleTodoEventListeners();
+    this.DOMBuilder.buildSingleTodo(todo);
+    this.EventAttacher.addSingleTodoEventListeners();
   }
   refreshProjectPage() {
-    clearContentDiv();
-    buildProjectsPage();
-    addProjectEventListeners();
+    this.DOMBuilder.clearContentDiv();
+    this.DOMBuilder.buildProjectsPage();
+    this.EventAttacher.addProjectEventListeners();
   }
   refreshTodoPage(proj) {
-    clearContentDiv();
-    buildAllTodosInProject(proj);
-    addTodoEventListeners();
+    this.DOMBuilder.clearContentDiv();
+    this.DOMBuilder.buildAllTodosInProject(proj);
+    this.EventAttacher.addTodoEventListeners();
   }
 
   setLocalStorage() {
-    if (projectList.length === 0){
+    if (this.projectList.length === 0){
       localStorage.clear;
     }
-    else if (projectList.length > 0) {
-      localStorage.setItem('projectList', JSON.stringify(projectList));
+    else if (this.projectList.length > 0) {
+      localStorage.setItem('projectList', JSON.stringify(this.projectList));
     }
   }
 
@@ -148,22 +152,16 @@ class AppHandler {
     if (localStorage.length != 0) {
       const projectListInStorage = JSON.parse(localStorage.getItem('projectList'));
       
-      const objBuilder = new this.BuilderClass(this.ProjectClass, this.TodoClass, projectListInStorage);
+      const objBuilder = new this.LocalStorageBuilder(this.ProjectClass, this.TodoClass, projectListInStorage);
       const updatedProjectList = objBuilder.build();
       updatedProjectList.forEach(project => {
-        projectList.push(project);
+        this.projectList.push(project);
       });
     }
     else if (localStorage.length === 0) {
       //Make default project
       const defaultProject = new this.ProjectClass({name: 'Default Project', todo: this.TodoClass});
-      projectList.push(defaultProject);
+      this.projectList.push(defaultProject);
     }
-  }
-
-  initialize() {
-    this.getFromLocalStorage();
-    buildProjectsPage();
-    addProjectEventListeners();
   }
 }
